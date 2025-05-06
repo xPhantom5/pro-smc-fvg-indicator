@@ -43,6 +43,6 @@ _You can upload a screenshot of your chart and paste it here._
 ## 📄 License
 
 MIT License  
-Created by [Your Name]
+Created by [xPhantom]
 
 Inspired by Smart Money Concepts, powered by Pine Script v5
