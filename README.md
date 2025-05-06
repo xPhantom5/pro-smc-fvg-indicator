@@ -36,7 +36,7 @@ A Fair Value Gap is detected when:
 
 ## 🖼️ Screenshot
 
-_You can upload a screenshot of your chart and paste it here._
+![image](https://github.com/user-attachments/assets/03def779-77f6-4c04-ba06-d6ba733a7d34)
 
 ---
 
