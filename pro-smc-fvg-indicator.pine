@@ -1,0 +1,54 @@
+//@version=5
+indicator("🔥 Pro SMC Fair Value Gap (FVG) Indicator", overlay=true)
+
+// === INPUTS === //
+showBullishFVG = input.bool(true, "Show Bullish FVG")
+showBearishFVG = input.bool(true, "Show Bearish FVG")
+bullColor = input.color(color.new(color.green, 60), "Bullish FVG Fill")
+bearColor = input.color(color.new(color.red, 60), "Bearish FVG Fill")
+bullBorder = input.color(color.green, "Bullish FVG Border")
+bearBorder = input.color(color.red, "Bearish FVG Border")
+labelSize = input.string("small", "Label Size", options=["tiny", "small", "normal", "large", "huge"])
+maxBoxes = input.int(100, "Max Boxes on Chart")
+useStrongDisplacement = input.bool(true, "Use Displacement Filter (ATR-based)")
+displacementMultiplier = input.float(1.5, "Displacement Strength", step=0.1)
+
+// === CONDITIONS === //
+body = math.abs(close - open)
+displacement = body > ta.atr(14) * displacementMultiplier
+
+isBullishFVG = low > high[2]
+isBearishFVG = high < low[2]
+
+validBullFVG = isBullishFVG and (not useStrongDisplacement or displacement)
+validBearFVG = isBearishFVG and (not useStrongDisplacement or displacement)
+
+// === STORAGE === //
+var box[] fvgBoxes = array.new_box()
+var label[] fvgLabels = array.new_label()
+
+// === DRAWING === //
+if showBullishFVG and validBullFVG
+    b = box.new(left=bar_index[2], right=bar_index, top=low, bottom=high[2], bgcolor=bullColor, border_color=bullBorder)
+    l = label.new(x=bar_index, y=low, text="Bullish FVG", style=label.style_label_up, textcolor=color.white, size=labelSize, color=color.green)
+    array.push(fvgBoxes, b)
+    array.push(fvgLabels, l)
+
+if showBearishFVG and validBearFVG
+    b = box.new(left=bar_index[2], right=bar_index, top=high[2], bottom=low, bgcolor=bearColor, border_color=bearBorder)
+    l = label.new(x=bar_index, y=high, text="Bearish FVG", style=label.style_label_down, textcolor=color.white, size=labelSize, color=color.red)
+    array.push(fvgBoxes, b)
+    array.push(fvgLabels, l)
+
+// === AUTO DELETE OLD OBJECTS === //
+if array.size(fvgBoxes) > maxBoxes
+    oldBox = array.shift(fvgBoxes)
+    box.delete(oldBox)
+
+if array.size(fvgLabels) > maxBoxes
+    oldLabel = array.shift(fvgLabels)
+    label.delete(oldLabel)
+
+// === ALERTS === //
+alertcondition(validBullFVG, title="Bullish FVG Detected", message="Bullish Fair Value Gap formed!")
+alertcondition(validBearFVG, title="Bearish FVG Detected", message="Bearish Fair Value Gap formed!")
